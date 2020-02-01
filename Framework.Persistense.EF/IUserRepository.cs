@@ -4,7 +4,8 @@ using System.Text;
 
 namespace Framework.Persistense.EF
 {
-    public class IUserRepository
+    public interface IUserRepository
     {
+
     }
 }

@@ -34,6 +34,7 @@ namespace CQRSFramework
             //var fooService = sp.GetService<MainContext>();
             
             services.AddSingleton<ICommandBus, CommandBus>();
+            services.AddSingleton<IUserRepository, UserRepository>();
 
             services.AddScoped<IBaseCommandHandler<CreateUserCommand>, CreateUserHandler>();
             services.AddScoped<IBaseCommandHandler<DeactiveUserCommand>, DeactiveUserHandler>();
