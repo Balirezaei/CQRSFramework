@@ -1,5 +1,10 @@
+using System.Collections.Generic;
+using CQRSFramework.Facade.Query;
+using CQRSFramework.QueryModel;
 using Framework.ApplicationService.Contract;
+using Framework.ApplicationService.Contract.User;
 using Framework.ApplicationService.UserCommandHandler;
+using Framework.ApplicationService.UserQueryHandler;
 using Framework.Core;
 using Framework.Core.LogCommandHandler;
 using Framework.Persistense.EF;
@@ -28,13 +33,23 @@ namespace CQRSFramework
 
             services.AddDbContext<MainContext>(options =>
              options.UseInMemoryDatabase(databaseName: "MainContext"));
+
+
+            services.AddDbContext<MainQueryModel>(options =>
+                options.UseInMemoryDatabase(databaseName: "MainQueryModel"));
+
             //var sp = services.BuildServiceProvider();
 
             //// Resolve the services from the service provider
             //var fooService = sp.GetService<MainContext>();
-            
+
             services.AddSingleton<ICommandBus, CommandBus>();
-            services.AddSingleton<IUserRepository, UserRepository>();
+
+            services.AddScoped<IQueryProcessor, QueryProcessor>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserQueryFacade, UserQueryFacade>();
+            services.AddScoped<IBaseQueryHandler<PagingContract, List<UserDto>>, GetUserQueryHandler>();
+
 
             services.AddScoped<IBaseCommandHandler<CreateUserCommand>, CreateUserHandler>();
             services.AddScoped<IBaseCommandHandler<DeactiveUserCommand>, DeactiveUserHandler>();

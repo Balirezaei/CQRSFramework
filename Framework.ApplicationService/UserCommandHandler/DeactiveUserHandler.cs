@@ -4,11 +4,10 @@ using Framework.Persistense.EF;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Framework.ApplicationService.Contract.User;
 
 namespace Framework.ApplicationService.UserCommandHandler
 {
- 
-
     public class DeactiveUserHandler : IBaseCommandHandler<DeactiveUserCommand>
     {
         public DeactiveUserHandler(IUserRepository userRepository)

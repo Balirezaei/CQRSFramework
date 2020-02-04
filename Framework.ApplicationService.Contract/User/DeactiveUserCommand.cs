@@ -1,9 +1,6 @@
 ﻿using Framework.Core;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Framework.ApplicationService.Contract
+namespace Framework.ApplicationService.Contract.User
 {
 
     public class DeactiveUserCommand : Command

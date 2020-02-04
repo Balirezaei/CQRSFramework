@@ -1,6 +1,6 @@
 ﻿using Framework.Core;
 
-namespace Framework.ApplicationService.Contract
+namespace Framework.ApplicationService.Contract.User
 {
     public class CreateUserCommand : Command
     {

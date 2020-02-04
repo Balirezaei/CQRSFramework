@@ -1,4 +1,5 @@
 ﻿using Framework.ApplicationService.Contract;
+using Framework.ApplicationService.Contract.User;
 using Framework.Core;
 using Framework.Domain;
 using Framework.Persistense.EF;

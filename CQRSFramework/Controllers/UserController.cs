@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CQRSFramework.Facade.Query;
 using Framework.ApplicationService.Contract;
+using Framework.ApplicationService.Contract.User;
 using Framework.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +13,12 @@ using Newtonsoft.Json;
 namespace CQRSFramework.Controllers
 {
     [Route("api/[controller]/[action]")]
+
     [ApiController]
     public class UserController : ControllerBase
     {
         private readonly ICommandBus _commandBus;
+        private readonly IUserQueryFacade _userQueryFacade;
 
         //private readonly IBaseCommandHandler<CreateUserCommand> handler;
 
@@ -24,9 +28,15 @@ namespace CQRSFramework.Controllers
         //}
 
 
-        public UserController(ICommandBus commandBus)
+        public UserController(ICommandBus commandBus, IUserQueryFacade userQueryFacade)
         {
             _commandBus = commandBus;
+            _userQueryFacade = userQueryFacade;
+        }
+        [HttpGet]
+        public List<UserDto> GetAllUser()
+        {
+            return _userQueryFacade.GetAll(new PagingContract());
         }
 
         // POST: api/User
@@ -43,4 +53,5 @@ namespace CQRSFramework.Controllers
         }
 
     }
+
 }

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CQRSFramework.Facade.Contract\CQRSFramework.Facade.Contract.csproj" />
+    <ProjectReference Include="..\Framework.ApplicationService.Contract\Framework.ApplicationService.Contract.csproj" />
+  </ItemGroup>
+
+</Project>

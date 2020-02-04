@@ -2,6 +2,7 @@
 
 using Framework.Core.LogCommandHandler;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 
 
