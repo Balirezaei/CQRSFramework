@@ -6,6 +6,7 @@ using CQRSFramework.Facade.Query;
 using Framework.ApplicationService.Contract;
 using Framework.ApplicationService.Contract.User;
 using Framework.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -41,8 +42,10 @@ namespace CQRSFramework.Controllers
 
         // POST: api/User
         [HttpPost]
+        [Authorize]
         public async Task Post([FromBody] CreateUserCommand userCommand)
         {
+            var userClaims = HttpContext.User.Claims;
             _commandBus.Dispatch<CreateUserCommand>(userCommand);
         }
 

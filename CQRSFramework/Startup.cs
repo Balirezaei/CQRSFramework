@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
 using CQRSFramework.Facade.Query;
 using CQRSFramework.QueryModel;
+using CQRSFramework.Utility;
 using Framework.ApplicationService.Contract;
 using Framework.ApplicationService.Contract.User;
 using Framework.ApplicationService.UserCommandHandler;
@@ -8,13 +12,14 @@ using Framework.ApplicationService.UserQueryHandler;
 using Framework.Core;
 using Framework.Core.LogCommandHandler;
 using Framework.Persistense.EF;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CQRSFramework
 {
@@ -53,20 +58,78 @@ namespace CQRSFramework
 
             services.AddScoped<IBaseCommandHandler<CreateUserCommand>, CreateUserHandler>();
             services.AddScoped<IBaseCommandHandler<DeactiveUserCommand>, DeactiveUserHandler>();
-
+            services.AddScoped<ITokenService, TokenService>();
+            
             services.AddScoped(typeof(LoggingHandler<>));
 
-            //services.AddScoped< typeof(IBaseCommandHandler<>)> ();
-            //services.AddSingleton(typeof(IBaseCommandHandler<>)));
-            //typeof(ICommandHandler<>)
-
-            //services.AddScoped<IBaseCommandHandler<CreateUserCommand>>(n => new LoggingHandler<CreateUserCommand>(new CreateUserHandler(fooService)));
-
-
-            //services.AddScoped<IAuthorRepository, AuthorRepository>();
-            //services.Decorate<IAuthorRepository, CachedAuthorRepository>();
 
             services.AddControllers();
+            //            services.AddAuthentication(option =>
+            //            {
+            //                option.DefaultScheme = "bearer";
+            //                
+            //            });
+
+
+            var key = Encoding.ASCII.GetBytes("serverSigningPassword");
+            services.AddAuthentication(x =>
+                {
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultScheme = "bearer";
+                })
+                .AddJwtBearer(x =>
+                {
+                    x.RequireHttpsMetadata = false;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false
+                    };
+                    x.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = context =>
+                        {
+                            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                            {
+                                context.Response.Headers.Add("Token-Expired", "true");
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
+
+            //services.AddAuthentication(options =>
+            //{
+            //    options.DefaultScheme = "bearer";
+            //})
+
+            //{
+            //    options.TokenValidationParameters = new TokenValidationParameters
+            //    {
+            //        ValidateAudience = false,
+            //        ValidateIssuer = false,
+            //        ValidateIssuerSigningKey = true,
+            //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["serverSigningPassword"])),
+            //        ValidateLifetime = true,
+            //        ClockSkew = TimeSpan.Zero //the default for this setting is 5 minutes
+            //    };
+            //    options.Events = new JwtBearerEvents
+            //    {
+            //        OnAuthenticationFailed = context =>
+            //        {
+            //            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+            //            {
+            //                context.Response.Headers.Add("Token-Expired", "true");
+            //            }
+            //            return Task.CompletedTask;
+            //        }
+            //    };
+            //});
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -81,6 +144,7 @@ namespace CQRSFramework
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
