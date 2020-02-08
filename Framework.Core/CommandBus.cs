@@ -11,13 +11,20 @@ namespace Framework.Core
         public CommandBus(IServiceProvider services)
         {
             this.services = services;
-        }        
+        }
         public void Dispatch<T>(T command) where T : Command
         {
             IBaseCommandHandler<T> handler = null;
             try
             {
-                handler =(IBaseCommandHandler<T>) services.GetService((typeof(LoggingHandlerDecorator<T>)));
+//                handler = new AuthorizeCommandHandlerDecorator<T>((IBaseCommandHandler<T>)services.GetService(typeof(AuthorizeCommandHandlerDecorator<T>)));
+                handler = (IBaseCommandHandler<T>)services.GetService((typeof(LoggingHandlerDecorator<T>)));
+
+                handler = new AuthorizeCommandHandlerDecorator<T>(handler);
+
+                //                ((IBaseCommandHandler<T>) services.GetService(typeof(AuthorizeCommandHandlerDecorator<T>)));
+                //                handler =(IBaseCommandHandler<T>) services.GetService((typeof(LoggingHandlerDecorator<T>)));
+                //      handler =(IBaseCommandHandler<T>) services.GetService(typeof(LoggingHandlerDecorator<T>(typeof(LoggingHandlerDecorator<T>))));
                 //handler = services.GetService<LoggingHandler<T>>();
                 handler.Handle(command);
             }
