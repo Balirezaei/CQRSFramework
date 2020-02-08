@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CQRSFramework.Facade.Contract\CQRSFramework.Facade.Contract.csproj" />
     <ProjectReference Include="..\CQRSFramework.Facade.Query\CQRSFramework.Facade.Query.csproj" />
+    <ProjectReference Include="..\CQRSFramework.LogManagement\CQRSFramework.LogManagement.csproj" />
     <ProjectReference Include="..\CQRSFramework.QueryModel\CQRSFramework.QueryModel.csproj" />
     <ProjectReference Include="..\Framework.ApplicationService.Contract\Framework.ApplicationService.Contract.csproj" />
     <ProjectReference Include="..\Framework.ApplicationService\Framework.ApplicationService.csproj" />

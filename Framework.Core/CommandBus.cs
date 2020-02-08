@@ -1,8 +1,4 @@
-﻿
-
-using Framework.Core.LogCommandHandler;
-using System;
-using System.ComponentModel;
+﻿using System;
 using System.Diagnostics;
 
 
@@ -21,7 +17,7 @@ namespace Framework.Core
             IBaseCommandHandler<T> handler = null;
             try
             {
-                handler =(IBaseCommandHandler<T>) services.GetService(typeof(LoggingHandler<T>));
+                handler =(IBaseCommandHandler<T>) services.GetService((typeof(LoggingHandlerDecorator<T>)));
                 //handler = services.GetService<LoggingHandler<T>>();
                 handler.Handle(command);
             }

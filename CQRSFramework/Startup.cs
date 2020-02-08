@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using CQRSFramework.Facade.Query;
@@ -10,11 +13,12 @@ using Framework.ApplicationService.Contract.User;
 using Framework.ApplicationService.UserCommandHandler;
 using Framework.ApplicationService.UserQueryHandler;
 using Framework.Core;
-using Framework.Core.LogCommandHandler;
 using Framework.Persistense.EF;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -55,12 +59,36 @@ namespace CQRSFramework
             services.AddScoped<IUserQueryFacade, UserQueryFacade>();
             services.AddScoped<IBaseQueryHandler<PagingContract, List<UserDto>>, GetUserQueryHandler>();
 
-
             services.AddScoped<IBaseCommandHandler<CreateUserCommand>, CreateUserHandler>();
             services.AddScoped<IBaseCommandHandler<DeactiveUserCommand>, DeactiveUserHandler>();
             services.AddScoped<ITokenService, TokenService>();
+
+            services.AddScoped<ILogManagement, LogManagement.LogManagement>();
             
-            services.AddScoped(typeof(LoggingHandler<>));
+            services.AddScoped(typeof(LoggingHandlerDecorator<>));
+            //services.AddScoped<IHttpContextAccessor>();
+            services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
+
+            services.AddScoped<CurrentUser>(provider =>
+            {
+                var claims = provider.GetService<IHttpContextAccessor>().HttpContext.User.Claims;
+                var userIdClaim = claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+                string userId="";
+                if (userIdClaim != null)
+                {
+                    userId = userIdClaim.Value;
+                }
+                var userNameClaim = claims.SingleOrDefault(c => c.Type == ClaimTypes.Name);
+                string userName="";
+                if (userNameClaim != null)
+                {
+                    userName = userNameClaim.Value;
+                }
+                var currentUser = new CurrentUser();
+                currentUser.UserId = userId;
+                currentUser.UserName = userName;
+                return currentUser;
+            });
 
 
             services.AddControllers();
@@ -153,5 +181,49 @@ namespace CQRSFramework
             });
         }
     }
+
+    public class AppInitializationFilter : IAsyncActionFilter
+    {
+        private CurrentUser _session;
+
+        public AppInitializationFilter(
+            CurrentUser session
+        )
+        {
+            _session = session;
+        }
+
+        public async Task OnActionExecutionAsync(
+            ActionExecutingContext context,
+            ActionExecutionDelegate next
+        )
+        {
+            string userId = null;
+            string userName = null;
+
+            var claimsIdentity = (ClaimsIdentity)context.HttpContext.User.Identity;
+
+            var userIdClaim = claimsIdentity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim != null)
+            {
+                userId = userIdClaim.Value;
+            }
+
+            var userNameClaim = claimsIdentity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Name);
+            if (userNameClaim != null)
+            {
+                userName = userNameClaim.Value;
+            }
+
+  
+
+            _session.UserId = userId;
+            _session.UserName = userName;
+
+
+            var resultContext = await next();
+        }
+    }
+
 
 }
