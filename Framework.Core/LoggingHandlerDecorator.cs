@@ -3,23 +3,23 @@ using Newtonsoft.Json;
 
 namespace Framework.Core
 {
-    public class LoggingHandlerDecorator<T> : IBaseCommandHandler<T> where T : Command
+    public class LoggingHandlerDecorator<T, TResult> : IBaseCommandHandler<T, TResult> where T : Command
     {
         private readonly ILogManagement _log;
 
-        public LoggingHandlerDecorator(IBaseCommandHandler<T> next, ILogManagement log)
+        public LoggingHandlerDecorator(IBaseCommandHandler<T, TResult> next, ILogManagement log)
         {
             _log = log;
             _next = next;
         }
 
-        public IBaseCommandHandler<T> _next { get; }
+        public IBaseCommandHandler<T, TResult> _next { get; }
 
-        public void Handle(T cmd)
+        public TResult Handle(T cmd)
         {
             _log.DoLog(cmd);
-//            Debug.WriteLine(JsonConvert.SerializeObject(cmd));
-            _next.Handle(cmd);
+            //            Debug.WriteLine(JsonConvert.SerializeObject(cmd));
+            return _next.Handle(cmd);
         }
 
     }

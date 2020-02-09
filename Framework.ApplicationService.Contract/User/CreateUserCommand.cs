@@ -16,5 +16,4 @@ namespace Framework.ApplicationService.Contract.User
         protected CreateUserCommand() { }
 
     }
-
 }

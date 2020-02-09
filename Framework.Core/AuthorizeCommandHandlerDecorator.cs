@@ -1,22 +1,22 @@
 ﻿namespace Framework.Core
 {
-    public class AuthorizeCommandHandlerDecorator<T> : IBaseCommandHandler<T> where T : Command
+    public class AuthorizeCommandHandlerDecorator<T, TResult> : IBaseCommandHandler<T,TResult> where T : Command
     {
       
 
-        public AuthorizeCommandHandlerDecorator(IBaseCommandHandler<T> next)
+        public AuthorizeCommandHandlerDecorator(IBaseCommandHandler<T, TResult> next)
         {
           
             _next = next;
         }
 
-        public IBaseCommandHandler<T> _next { get; }
+        public IBaseCommandHandler<T, TResult> _next { get; }
 
-        public void Handle(T cmd)
+        public TResult Handle(T cmd)
         {
             
             //            Debug.WriteLine(JsonConvert.SerializeObject(cmd));
-            _next.Handle(cmd);
+           return _next.Handle(cmd);
         }
 
     }

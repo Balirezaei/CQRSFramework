@@ -2,8 +2,8 @@
 
 namespace Framework.Core
 {
-    public interface IBaseCommandHandler<T> where T : Command
+    public interface IBaseCommandHandler<T,TResult> where T : Command
     {
-         void Handle(T cmd);
+        TResult Handle(T cmd);
     }
 }

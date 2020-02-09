@@ -6,7 +6,7 @@ using Framework.Persistense.EF;
 
 namespace Framework.ApplicationService.UserCommandHandler
 {
-    public class CreateUserHandler : IBaseCommandHandler<CreateUserCommand>
+    public class CreateUserHandler : IBaseCommandHandler<CreateUserCommand, CreateUserCommandResult>
     {
         public CreateUserHandler(IUserRepository userRepository)
         {
@@ -15,11 +15,12 @@ namespace Framework.ApplicationService.UserCommandHandler
 
         private readonly IUserRepository _userRepository;
 
-        public void Handle(CreateUserCommand cmd)
+        public CreateUserCommandResult Handle(CreateUserCommand cmd)
         {
             var user = new User(cmd.UserName, cmd.Email, cmd.Password);
             //Context.AddAsync(user);
             //Context.SaveChangesAsync();
+            return new CreateUserCommandResult(user.Id);
         }
     }
 }
