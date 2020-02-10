@@ -8,7 +8,7 @@ using Framework.ApplicationService.Contract.User;
 
 namespace Framework.ApplicationService.UserCommandHandler
 {
-    public class DeactiveUserHandler : IBaseCommandHandler<DeactiveUserCommand>
+    public class DeactiveUserHandler : IBaseCommandHandler<DeactiveUserCommand, Nothing>
     {
         public DeactiveUserHandler(IUserRepository userRepository)
         {
@@ -17,11 +17,12 @@ namespace Framework.ApplicationService.UserCommandHandler
 
         private readonly IUserRepository _userRepository;
 
-        public void Handle(DeactiveUserCommand cmd)
+        public Nothing Handle(DeactiveUserCommand cmd)
         {
             //var user = Context.Users.Where(m => m.Id == cmd.Id).FirstOrDefault();
             //user.IsActive = false;
             //Context.SaveChanges();
+            return new Nothing();
         }
     }
 }

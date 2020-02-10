@@ -59,13 +59,13 @@ namespace CQRSFramework
             services.AddScoped<IUserQueryFacade, UserQueryFacade>();
             services.AddScoped<IBaseQueryHandler<PagingContract, List<UserDto>>, GetUserQueryHandler>();
 
-            services.AddScoped<IBaseCommandHandler<CreateUserCommand>, CreateUserHandler>();
-            services.AddScoped<IBaseCommandHandler<DeactiveUserCommand>, DeactiveUserHandler>();
+            services.AddScoped<IBaseCommandHandler<CreateUserCommand, CreateUserCommandResult>, CreateUserHandler>();
+            services.AddScoped<IBaseCommandHandler<DeactiveUserCommand,Nothing>, DeactiveUserHandler>();
             services.AddScoped<ITokenService, TokenService>();
 
             services.AddScoped<ILogManagement, LogManagement.LogManagement>();
             
-            services.AddScoped(typeof(LoggingHandlerDecorator<>));
+            services.AddScoped(typeof(LoggingHandlerDecorator<,>));
             //services.AddScoped<IHttpContextAccessor>();
             services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
 

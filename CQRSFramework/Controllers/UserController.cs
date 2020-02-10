@@ -43,16 +43,16 @@ namespace CQRSFramework.Controllers
         // POST: api/User
         [HttpPost]
         [Authorize]
-        public async Task Post([FromBody] CreateUserCommand userCommand)
+        public int Post([FromBody] CreateUserCommand userCommand)
         {
             var userClaims = HttpContext.User.Claims;
-            _commandBus.Dispatch<CreateUserCommand>(userCommand);
+            return _commandBus.Dispatch<CreateUserCommand, CreateUserCommandResult>(userCommand).UserId;
         }
 
         [HttpPut]
         public void Deactive(DeactiveUserCommand userCommand)
         {
-            _commandBus.Dispatch<DeactiveUserCommand>(userCommand);
+            _commandBus.Dispatch<DeactiveUserCommand, Nothing>(userCommand);
         }
 
     }
