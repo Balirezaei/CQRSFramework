@@ -1,6 +1,7 @@
 ﻿using System;
+using Framework.Core.QueryHandler;
 
-namespace Framework.Core
+namespace Framework.Core.QueryHandler
 {
     public class QueryProcessor : IQueryProcessor
     {

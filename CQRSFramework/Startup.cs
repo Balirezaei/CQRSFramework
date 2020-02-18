@@ -13,6 +13,9 @@ using Framework.ApplicationService.Contract.User;
 using Framework.ApplicationService.UserCommandHandler;
 using Framework.ApplicationService.UserQueryHandler;
 using Framework.Core;
+using Framework.Core.CommandBus;
+using Framework.Core.CommandHandlerDecorator;
+using Framework.Core.QueryHandler;
 using Framework.Persistense.EF;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -62,10 +65,14 @@ namespace CQRSFramework
             services.AddScoped<IBaseCommandHandler<CreateUserCommand, CreateUserCommandResult>, CreateUserHandler>();
             services.AddScoped<IBaseCommandHandler<DeactiveUserCommand,Nothing>, DeactiveUserHandler>();
             services.AddScoped<ITokenService, TokenService>();
-
+            
+            services.AddScoped<IErrorHandling, LogManagement.LogErrorHandle>();
             services.AddScoped<ILogManagement, LogManagement.LogManagement>();
             
             services.AddScoped(typeof(LoggingHandlerDecorator<,>));
+            services.AddScoped(typeof(CatchErrorCommandHandlerDecorator<,>));
+            services.AddScoped(typeof(AuthorizeCommandHandlerDecorator<,>));
+            
             //services.AddScoped<IHttpContextAccessor>();
             services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -181,49 +188,4 @@ namespace CQRSFramework
             });
         }
     }
-
-    public class AppInitializationFilter : IAsyncActionFilter
-    {
-        private CurrentUser _session;
-
-        public AppInitializationFilter(
-            CurrentUser session
-        )
-        {
-            _session = session;
-        }
-
-        public async Task OnActionExecutionAsync(
-            ActionExecutingContext context,
-            ActionExecutionDelegate next
-        )
-        {
-            string userId = null;
-            string userName = null;
-
-            var claimsIdentity = (ClaimsIdentity)context.HttpContext.User.Identity;
-
-            var userIdClaim = claimsIdentity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            if (userIdClaim != null)
-            {
-                userId = userIdClaim.Value;
-            }
-
-            var userNameClaim = claimsIdentity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Name);
-            if (userNameClaim != null)
-            {
-                userName = userNameClaim.Value;
-            }
-
-  
-
-            _session.UserId = userId;
-            _session.UserName = userName;
-
-
-            var resultContext = await next();
-        }
-    }
-
-
 }

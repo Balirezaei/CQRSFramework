@@ -6,7 +6,9 @@ using CQRSFramework.Facade.Query;
 using Framework.ApplicationService.Contract;
 using Framework.ApplicationService.Contract.User;
 using Framework.Core;
+using Framework.Core.CommandBus;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -34,7 +36,9 @@ namespace CQRSFramework.Controllers
             _commandBus = commandBus;
             _userQueryFacade = userQueryFacade;
         }
+
         [HttpGet]
+        //[EnableCors("AllowOrigin")]
         public List<UserDto> GetAllUser()
         {
             return _userQueryFacade.GetAll(new PagingContract());
@@ -42,7 +46,7 @@ namespace CQRSFramework.Controllers
 
         // POST: api/User
         [HttpPost]
-        [Authorize]
+      //  [Authorize]
         public int Post([FromBody] CreateUserCommand userCommand)
         {
             var userClaims = HttpContext.User.Claims;

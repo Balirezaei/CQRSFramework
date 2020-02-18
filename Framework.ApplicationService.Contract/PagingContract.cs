@@ -1,4 +1,5 @@
 ﻿using Framework.Core;
+using Framework.Core.Base;
 
 namespace Framework.ApplicationService.Contract
 {

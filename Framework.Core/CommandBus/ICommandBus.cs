@@ -1,6 +1,8 @@
 ﻿
 
-namespace Framework.Core
+using Framework.Core.Base;
+
+namespace Framework.Core.CommandBus
 {
     public interface ICommandBus
     {

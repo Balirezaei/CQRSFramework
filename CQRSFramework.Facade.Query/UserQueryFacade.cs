@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Framework.ApplicationService.Contract;
 using Framework.Core;
+using Framework.Core.QueryHandler;
 
 namespace CQRSFramework.Facade.Query
 {
