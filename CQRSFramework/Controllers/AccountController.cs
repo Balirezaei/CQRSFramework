@@ -20,7 +20,7 @@ namespace CQRSFramework.Controllers
             _tokenService = tokenService;
         }
 
-        public string GetTestToken()
+        public IActionResult Login(string user,string password)
         {
             var usersClaims = new[]
             {
@@ -29,10 +29,19 @@ namespace CQRSFramework.Controllers
                 new Claim("CanCreateUser","true"), 
                 new Claim("CanDeactiveUser","true"),
             };
-
+            if (user == "!!!!")
+            {
+                return BadRequest();
+            }
             var jwtToken = _tokenService.GenerateAccessToken(usersClaims);
             var refreshToken = _tokenService.GenerateRefreshToken();
-            return jwtToken;
+            //            return new Json(new {Token= jwtToken});
+
+            return new ObjectResult(new
+            {
+                token = jwtToken,
+                refreshToken = refreshToken
+            });
         }
     }
 }

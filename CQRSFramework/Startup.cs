@@ -43,6 +43,15 @@ namespace CQRSFramework
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddCors(options => options.AddPolicy("ApiCorsPolicy", builder =>
+            {
+                builder
+                    .AllowAnyOrigin()
+                    .AllowAnyMethod().AllowAnyHeader();
+            }));
+
+
+
             services.AddDbContext<MainContext>(options =>
              options.UseInMemoryDatabase(databaseName: "MainContext"));
 
@@ -170,6 +179,7 @@ namespace CQRSFramework
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseCors("ApiCorsPolicy");
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
