@@ -47,7 +47,8 @@ namespace CQRSFramework
             {
                 builder
                     .AllowAnyOrigin()
-                    .AllowAnyMethod().AllowAnyHeader();
+                    .AllowAnyMethod().AllowAnyHeader()
+                    .WithExposedHeaders("Token-Expired");
             }));
 
 
@@ -115,7 +116,7 @@ namespace CQRSFramework
             //            });
 
 
-            var key = Encoding.ASCII.GetBytes("serverSigningPassword");
+            var key = Encoding.ASCII.GetBytes(Configuration["serverSigningPassword"]);
             services.AddAuthentication(x =>
                 {
                     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -124,14 +125,14 @@ namespace CQRSFramework
                 })
                 .AddJwtBearer(x =>
                 {
-                    x.RequireHttpsMetadata = false;
-                    x.SaveToken = true;
                     x.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(key),
                         ValidateIssuer = false,
-                        ValidateAudience = false
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
                     };
                     x.Events = new JwtBearerEvents
                     {

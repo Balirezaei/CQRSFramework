@@ -39,6 +39,7 @@ namespace CQRSFramework.Controllers
 
         [HttpGet]
         //[EnableCors("AllowOrigin")]
+        [Authorize]
         public List<UserDto> GetAllUser()
         {
             return _userQueryFacade.GetAll(new PagingContract());
