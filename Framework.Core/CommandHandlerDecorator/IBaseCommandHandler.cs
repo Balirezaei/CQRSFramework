@@ -1,6 +1,8 @@
 ﻿
 
-namespace Framework.Core
+using Framework.Core.Base;
+
+namespace Framework.Core.CommandHandlerDecorator
 {
     public interface IBaseCommandHandler<T,TResult> where T : Command
     {

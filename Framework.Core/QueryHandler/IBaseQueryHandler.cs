@@ -1,4 +1,4 @@
-﻿namespace Framework.Core
+﻿namespace Framework.Core.QueryHandler
 {
     public interface IBaseQueryHandler<TQuery,TResult> //where TQuery : Query
     {

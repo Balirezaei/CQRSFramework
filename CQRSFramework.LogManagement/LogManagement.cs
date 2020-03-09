@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using Framework.ApplicationService.Contract;
 using Framework.Core;
+using Framework.Core.CommandHandlerDecorator;
 using Newtonsoft.Json;
 
 namespace CQRSFramework.LogManagement

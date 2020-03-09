@@ -1,7 +1,6 @@
-﻿using System.Diagnostics;
-using Newtonsoft.Json;
+﻿using Framework.Core.Base;
 
-namespace Framework.Core
+namespace Framework.Core.CommandHandlerDecorator
 {
     public class LoggingHandlerDecorator<T, TResult> : IBaseCommandHandler<T, TResult> where T : Command
     {

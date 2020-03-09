@@ -1,4 +1,6 @@
-﻿namespace Framework.Core
+﻿using Framework.Core.Base;
+
+namespace Framework.Core.CommandHandlerDecorator
 {
     public class AuthorizeCommandHandlerDecorator<T, TResult> : IBaseCommandHandler<T,TResult> where T : Command
     {

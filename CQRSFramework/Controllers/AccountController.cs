@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CQRSFramework.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class AccountController : ControllerBase
     {
@@ -20,19 +20,52 @@ namespace CQRSFramework.Controllers
             _tokenService = tokenService;
         }
 
-        public string GetTestToken()
+        public IActionResult Login(string user, string password)
         {
             var usersClaims = new[]
             {
                 new Claim(ClaimTypes.Name, "Bahar"),
                 new Claim(ClaimTypes.NameIdentifier, "1"),
-                new Claim("CanCreateUser","true"), 
-                new Claim("CanDeactiveUser","true"),
+                new Claim(ClaimTypes.Role,"CanDeactiveUser"),
+                new Claim(ClaimTypes.Role,"CanCreateUser"),
+                new Claim(ClaimTypes.Role,"CanEditUser"),
+                new Claim(ClaimTypes.Role,"CanViewUser"),
             };
-
+            if (user == "!!!!")
+            {
+                return BadRequest();
+            }
             var jwtToken = _tokenService.GenerateAccessToken(usersClaims);
             var refreshToken = _tokenService.GenerateRefreshToken();
-            return jwtToken;
+            //            return new Json(new {Token= jwtToken});
+
+            return new ObjectResult(new
+            {
+                token = jwtToken,
+                refreshToken = refreshToken
+            });
+        }
+
+        public IActionResult RefreshToken(string token, string refreshToken)
+        {
+            var principal = _tokenService.GetPrincipalFromExpiredToken(token);
+            var username = principal.Identity.Name; //this is mapped to the Name claim by default
+
+            //            var user = _usersDb.Users.SingleOrDefault(u => u.Username == username);
+            //            if (user == null || user.RefreshToken != refreshToken)
+            return BadRequest();
+
+            var newJwtToken = _tokenService.GenerateAccessToken(principal.Claims);
+            var newRefreshToken = _tokenService.GenerateRefreshToken();
+
+            //            user.RefreshToken = newRefreshToken;
+            //            await _usersDb.SaveChangesAsync();
+
+            return new ObjectResult(new
+            {
+                token = newJwtToken,
+                refreshToken = newRefreshToken
+            });
         }
     }
 }

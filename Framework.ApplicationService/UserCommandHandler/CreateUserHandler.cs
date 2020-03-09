@@ -1,6 +1,8 @@
-﻿using Framework.ApplicationService.Contract;
+﻿using System;
+using Framework.ApplicationService.Contract;
 using Framework.ApplicationService.Contract.User;
 using Framework.Core;
+using Framework.Core.CommandHandlerDecorator;
 using Framework.Domain;
 using Framework.Persistense.EF;
 
@@ -20,6 +22,7 @@ namespace Framework.ApplicationService.UserCommandHandler
             var user = new User(cmd.UserName, cmd.Email, cmd.Password);
             //Context.AddAsync(user);
             //Context.SaveChangesAsync();
+            throw new Exception("message");
             return new CreateUserCommandResult(user.Id);
         }
     }

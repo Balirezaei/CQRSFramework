@@ -1,4 +1,4 @@
-﻿namespace Framework.Core
+﻿namespace Framework.Core.CommandHandlerDecorator
 {
     public interface ILogManagement
     {

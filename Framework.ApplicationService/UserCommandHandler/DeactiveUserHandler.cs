@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Framework.ApplicationService.Contract.User;
+using Framework.Core.CommandHandlerDecorator;
 
 namespace Framework.ApplicationService.UserCommandHandler
 {
@@ -22,6 +23,7 @@ namespace Framework.ApplicationService.UserCommandHandler
             //var user = Context.Users.Where(m => m.Id == cmd.Id).FirstOrDefault();
             //user.IsActive = false;
             //Context.SaveChanges();
+
             return new Nothing();
         }
     }
