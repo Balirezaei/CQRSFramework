@@ -53,7 +53,7 @@ namespace CQRSFramework.Controllers
 
             //            var user = _usersDb.Users.SingleOrDefault(u => u.Username == username);
             //            if (user == null || user.RefreshToken != refreshToken)
-            return BadRequest();
+            //return BadRequest();
 
             var newJwtToken = _tokenService.GenerateAccessToken(principal.Claims);
             var newRefreshToken = _tokenService.GenerateRefreshToken();

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
@@ -73,16 +75,16 @@ namespace CQRSFramework
             services.AddScoped<IBaseQueryHandler<PagingContract, List<UserDto>>, GetUserQueryHandler>();
 
             services.AddScoped<IBaseCommandHandler<CreateUserCommand, CreateUserCommandResult>, CreateUserHandler>();
-            services.AddScoped<IBaseCommandHandler<DeactiveUserCommand,Nothing>, DeactiveUserHandler>();
+            services.AddScoped<IBaseCommandHandler<DeactiveUserCommand, Nothing>, DeactiveUserHandler>();
             services.AddScoped<ITokenService, TokenService>();
-            
+
             services.AddScoped<IErrorHandling, LogManagement.LogErrorHandle>();
             services.AddScoped<ILogManagement, LogManagement.LogManagement>();
-            
+
             services.AddScoped(typeof(LoggingHandlerDecorator<,>));
             services.AddScoped(typeof(CatchErrorCommandHandlerDecorator<,>));
             services.AddScoped(typeof(AuthorizeCommandHandlerDecorator<,>));
-            
+
             //services.AddScoped<IHttpContextAccessor>();
             services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -90,13 +92,13 @@ namespace CQRSFramework
             {
                 var claims = provider.GetService<IHttpContextAccessor>().HttpContext.User.Claims;
                 var userIdClaim = claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-                string userId="";
+                string userId = "";
                 if (userIdClaim != null)
                 {
                     userId = userIdClaim.Value;
                 }
                 var userNameClaim = claims.SingleOrDefault(c => c.Type == ClaimTypes.Name);
-                string userName="";
+                string userName = "";
                 if (userNameClaim != null)
                 {
                     userName = userNameClaim.Value;
@@ -106,17 +108,18 @@ namespace CQRSFramework
                 currentUser.UserName = userName;
                 return currentUser;
             });
-
-
+            
             services.AddControllers();
-            //            services.AddAuthentication(option =>
-            //            {
-            //                option.DefaultScheme = "bearer";
-            //                
-            //            });
 
 
-            var key = Encoding.ASCII.GetBytes(Configuration["serverSigningPassword"]);
+            RSA publicRsa = RSA.Create();
+
+            publicRsa.FromXmlFile(Path.Combine(Directory.GetCurrentDirectory(),
+                "Keys",
+                this.Configuration.GetValue<String>("PublicKey")
+            ));
+            RsaSecurityKey signingKey = new RsaSecurityKey(publicRsa);
+
             services.AddAuthentication(x =>
                 {
                     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -128,7 +131,7 @@ namespace CQRSFramework
                     x.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        IssuerSigningKey = signingKey,
                         ValidateIssuer = false,
                         ValidateAudience = false,
                         ValidateLifetime = true,
@@ -136,6 +139,12 @@ namespace CQRSFramework
                     };
                     x.Events = new JwtBearerEvents
                     {
+                        //                        OnMessageReceived = context =>
+                        //                        {
+                        //                            context.Token = context.Request.Cookies["token"];
+                        //                            return Task.CompletedTask;
+                        //                        },
+
                         OnAuthenticationFailed = context =>
                         {
                             if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
@@ -144,6 +153,8 @@ namespace CQRSFramework
                             }
                             return Task.CompletedTask;
                         }
+
+
                     };
                 });
 

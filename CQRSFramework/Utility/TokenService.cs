@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -19,17 +20,42 @@ namespace CQRSFramework.Utility
         }
         public string GenerateAccessToken(IEnumerable<Claim> claims)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["serverSigningPassword"]));
+            //            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["serverSigningPassword"]));
 
-            var jwtToken = new JwtSecurityToken(issuer: "Bahar",
-                audience: "Anyone",
-                claims: claims,
-                notBefore: DateTime.UtcNow,
-                expires: DateTime.UtcNow.AddMinutes(int.Parse(_configuration["accessTokenDurationInMinutes"])),
-                signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
-            );
+            using (RSA privateRsa = RSA.Create())
+            {
+                var tt = Path.Combine(Directory.GetCurrentDirectory(),
+                    "Keys",
+                    this._configuration.GetValue<String>("PrivateKey")
+                );
+                privateRsa.FromXmlFile(tt);
+                var privateKey = new RsaSecurityKey(privateRsa);
+                SigningCredentials signingCredentials = new SigningCredentials(privateKey, SecurityAlgorithms.RsaSha256);
 
-            return new JwtSecurityTokenHandler().WriteToken(jwtToken);
+                var jwtToken = new JwtSecurityToken(issuer: "Bahar",
+                    audience: "Anyone",
+                    claims: claims,
+                    notBefore: DateTime.UtcNow,
+                    expires: DateTime.UtcNow.AddMinutes(int.Parse(_configuration["accessTokenDurationInMinutes"])),
+                    signingCredentials: signingCredentials
+                );
+
+                return new JwtSecurityTokenHandler().WriteToken(jwtToken);
+
+//                var jwt = new JwtSecurityToken(
+//                    signingCredentials: signingCredentials,
+//                    claims: claims,
+//                    notBefore: utcNow,
+//                    expires: utcNow.AddSeconds(this.configuration.GetValue<int>("Tokens:Lifetime")),
+//                    audience: this.configuration.GetValue<String>("Tokens:Audience"),
+//                    issuer: this.configuration.GetValue<String>("Tokens:Issuer")
+//                );
+//
+//                return new JwtSecurityTokenHandler().WriteToken(jwt);
+            }
+
+
+            
         }
 
         public string GenerateRefreshToken()
